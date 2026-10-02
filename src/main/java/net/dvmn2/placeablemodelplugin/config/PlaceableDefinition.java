@@ -19,6 +19,7 @@ public record PlaceableDefinition(
         Vector3f scale,
         Vector3f offset,
         float rotationOffset,
+        float pitch,                  // наклон модели, градусы (не зависит от pitch игрока)
         boolean alignToSurface,
         ItemDisplay.ItemDisplayTransform itemTransform,
         float viewRange,

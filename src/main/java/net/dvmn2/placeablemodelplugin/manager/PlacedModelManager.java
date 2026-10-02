@@ -62,8 +62,13 @@ public final class PlacedModelManager {
         ItemStack single = held.asOne();
         float yaw = player.getLocation().getYaw();
 
-        Quaternionf rotation = computeRotation(face, yaw, def);
-        Vector3f offsetWorld = rotation.transform(new Vector3f(def.offset()));
+        // Смещение считается в системе координат модели БЕЗ наклона, а наклон (pitch)
+        // применяется поверх — модель наклоняется вокруг собственного центра, и
+        // положение центра от pitch не зависит.
+        Quaternionf baseRotation = computeRotation(face, yaw, def);
+        Vector3f offsetWorld = baseRotation.transform(new Vector3f(def.offset()));
+        Quaternionf rotation = new Quaternionf(baseRotation)
+                .rotateX((float) Math.toRadians(def.pitch()));
 
         Location origin = new Location(world, point.getX(), point.getY(), point.getZ());
         Location visualCenter = origin.clone().add(offsetWorld.x, offsetWorld.y, offsetWorld.z);
@@ -125,6 +130,8 @@ public final class PlacedModelManager {
      *     <li>боковые грани: верх модели смотрит от стены.</li>
      * </ul>
      * При {@code align_to_surface: false} модель всегда стоит вертикально.
+     * Наклон {@code display.pitch} сюда не входит — он добавляется отдельно и
+     * никак не связан с pitch игрока (используется только yaw игрока).
      */
     private Quaternionf computeRotation(BlockFace face, float playerYaw, PlaceableDefinition def) {
         float facingYaw = playerYaw + 180f + def.rotationOffset();

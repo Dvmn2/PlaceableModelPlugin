@@ -199,6 +199,7 @@ public final class DefinitionRegistry {
         Vector3f scale = readScale(p.get("display.scale"), new Vector3f(1f, 1f, 1f), where, log);
         Vector3f offset = readVector(p.get("display.offset"), new Vector3f(0f, 0.5f, 0f), where + ".display.offset", log);
         float rotationOffset = p.num("display.rotation_offset", 0f);
+        float pitch = p.num("display.pitch", 0f);
         boolean align = p.bool("display.align_to_surface", true);
         float viewRange = p.num("display.view_range", 1f);
 
@@ -231,7 +232,7 @@ public final class DefinitionRegistry {
 
         return new PlaceableDefinition(
                 type, Set.copyOf(values), baseItem,
-                scale, offset, rotationOffset, align, transform, viewRange, blockLight, skyLight,
+                scale, offset, rotationOffset, pitch, align, transform, viewRange, blockLight, skyLight,
                 width, height, yOffset, responsive,
                 readSound(p, "place"), readSound(p, "pickup"));
     }
