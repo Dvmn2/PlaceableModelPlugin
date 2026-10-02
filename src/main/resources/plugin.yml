@@ -1,0 +1,19 @@
+name: PlaceableModelPlugin
+version: '${version}'
+
+main: net.dvmn2.placeablemodelplugin.PlaceableModelPlugin
+api-version: '1.21.11'
+load: POSTWORLD
+
+authors: [ DVMN2 ]
+
+permissions:
+  placeablemodel.place:
+    description: Allows placing items with a custom model as item displays.
+    default: true
+  placeablemodel.pickup:
+    description: Allows picking placed models back up.
+    default: true
+  placeablemodel.reload:
+    description: Allows /placeablemodel reload.
+    default: op

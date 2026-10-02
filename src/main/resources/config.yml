@@ -1,0 +1,98 @@
+# ======================================================================
+#  PlaceableModelPlugin
+# ======================================================================
+#  Предмет в основной руке ставится ПКМ по блоку (любая грань), если он
+#  совпал с записью в одном из 4 массивов ниже. Подбирается ПКМ пустой рукой.
+#  Порядок проверки: custom_model_data -> item_model -> equipable -> rename
+#  (побеждает первая совпавшая запись).
+#
+#  Каждая запись = условие совпадения + необязательные параметры.
+#  Любой параметр можно не указывать — тогда берётся из секции "defaults".
+#
+#  Формат записи (все поля кроме match необязательны):
+#
+#  - match: "chair_wood"        # строка или список строк (синонимы, как "when" в item definition)
+#    base_item: FILLED_MAP      # необязательно: ещё и фильтр по типу предмета
+#    display:
+#      scale: [1.0, 1.0, 1.0]   # или одно число для равномерного масштаба
+#      offset: [0.0, 0.5, 0.0]  # смещение центра модели в её ЛОКАЛЬНЫХ осях:
+#                               #   Y = "от поверхности наружу", X/Z — вдоль поверхности
+#      rotation_offset: 0.0     # доп. поворот вокруг вертикали модели (градусы)
+#      align_to_surface: true   # true: низ модели лежит на поверхности (пол/стена/потолок)
+#                               # false: модель всегда стоит вертикально, поворот по игроку
+#      item_transform: NONE     # NONE, FIXED, HEAD, GROUND, GUI, THIRDPERSON_*, FIRSTPERSON_*
+#      view_range: 1.0          # множитель дальности прорисовки
+#      brightness: {block: 15, sky: 15}   # необязательно, иначе освещение от мира
+#    interaction:
+#      width: 1.0               # ширина хитбокса интеракшн-сущности
+#      height: 1.0              # высота хитбокса
+#      y_offset: 0.0            # сдвиг хитбокса по вертикали (мировая ось Y)
+#      responsive: false        # true: рука игрока "машет" при клике
+#    sounds:
+#      place:  {sound: "minecraft:block.wood.place", volume: 1.0, pitch: 1.0}
+#      pickup: {sound: "minecraft:block.wood.break", volume: 1.0, pitch: 1.0}
+#                               # sound: "" — отключить звук
+#
+#  Как соответствует ResourceManager:
+#    custom_model_data -> первая строка custom_model_data.strings предмета
+#    item_model        -> компонент item_model (id из assets/<ns>/items/<name>.json), например "mypack:chair"
+#    equipable         -> equippable.asset_id (assets/<ns>/equipment/<name>.json), например "armor:anarch_i_c"
+#    rename            -> custom_name предмета (имя из наковальни), точное совпадение с учётом регистра
+# ======================================================================
+
+settings:
+  # auto - по клиентской локали игрока (ru -> русский, иначе английский) / ru / en
+  language: auto
+
+  # Если игрок держит предмет-модель и кликает ПО уже поставленной модели
+  # (её хитбокс перекрывает блок), то предмет ставится на блок за ней.
+  place_through_models: true
+
+# Значения по умолчанию для всех записей
+defaults:
+  display:
+    scale: [1.0, 1.0, 1.0]
+    offset: [0.0, 0.5, 0.0]
+    rotation_offset: 0.0
+    align_to_surface: true
+    item_transform: NONE
+    view_range: 1.0
+  interaction:
+    width: 1.0
+    height: 1.0
+    y_offset: 0.0
+    responsive: false
+  sounds:
+    place:
+      sound: "minecraft:block.wood.place"
+      volume: 1.0
+      pitch: 1.0
+    pickup:
+      sound: "minecraft:block.wood.break"
+      volume: 1.0
+      pitch: 1.0
+
+# ----------------------------------------------------------------------
+#  4 массива записей
+# ----------------------------------------------------------------------
+
+custom_model_data: []
+#  - match: "chair_wood"
+#    display:
+#      scale: 1.0
+#    interaction:
+#      width: 0.8
+#      height: 0.9
+
+item_model: []
+#  - match: "mypack:lamp"
+#    display:
+#      offset: [0.0, 0.25, 0.0]
+
+equipable: []
+#  - match: "armor:statue_head"
+#    base_item: DIAMOND_HELMET
+
+rename: []
+#  - match: ["Zombie", "zombie"]
+#    base_item: PAPER
