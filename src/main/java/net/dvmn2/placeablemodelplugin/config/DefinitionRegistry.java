@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -195,6 +196,9 @@ public final class DefinitionRegistry {
             }
         }
 
+        // --- допустимые поверхности ---
+        Set<Surface> surfaces = readSurfaces(p.get("placement.surfaces"), where, log);
+
         // --- ItemDisplay ---
         Vector3f scale = readScale(p.get("display.scale"), new Vector3f(1f, 1f, 1f), where, log);
         Vector3f offset = readVector(p.get("display.offset"), new Vector3f(0f, 0.5f, 0f), where + ".display.offset", log);
@@ -231,7 +235,7 @@ public final class DefinitionRegistry {
         boolean responsive = p.bool("interaction.responsive", false);
 
         return new PlaceableDefinition(
-                type, Set.copyOf(values), baseItem,
+                type, Set.copyOf(values), baseItem, surfaces,
                 scale, offset, rotationOffset, pitch, align, transform, viewRange, blockLight, skyLight,
                 width, height, yOffset, responsive,
                 readSound(p, "place"), readSound(p, "pickup"));
@@ -250,6 +254,27 @@ public final class DefinitionRegistry {
             s = "minecraft:" + s.trim();
         }
         values.add(type == DefinitionType.RENAME || type == DefinitionType.CUSTOM_MODEL_DATA ? s : s.trim());
+    }
+
+    private static Set<Surface> readSurfaces(Object raw, String where, Logger log) {
+        if (raw == null) {
+            return EnumSet.allOf(Surface.class);
+        }
+        List<?> names = raw instanceof List<?> list ? list : List.of(raw);
+        Set<Surface> result = EnumSet.noneOf(Surface.class);
+        for (Object o : names) {
+            Surface surface = Surface.parse(String.valueOf(o));
+            if (surface == null) {
+                log.warning("[config] " + where + ": unknown surface '" + o + "' (expected floor, wall, ceiling).");
+            } else {
+                result.add(surface);
+            }
+        }
+        if (result.isEmpty()) {
+            log.warning("[config] " + where + ": placement.surfaces has no valid values, all surfaces allowed.");
+            return EnumSet.allOf(Surface.class);
+        }
+        return result;
     }
 
     private static SoundSpec readSound(Params p, String name) {

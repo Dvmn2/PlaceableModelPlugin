@@ -109,6 +109,10 @@ public final class EntityInteractListener implements Listener {
         Vector pos = hit.getHitPosition();
         Location point = new Location(player.getWorld(), pos.getX(), pos.getY(), pos.getZ());
         BlockFace face = hit.getHitBlockFace();
+        if (!def.allows(face)) {
+            Lang.sendActionBar(player, Lang.Key.SURFACE_NOT_ALLOWED);
+            return;
+        }
 
         if (manager.place(player, point, face, held, def)) {
             manager.consumeOne(player);

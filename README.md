@@ -17,8 +17,8 @@ Paper plugin that lets players place items with a custom model as `item_display`
 
 Details:
 
-- Placement is allowed on any block face: floor, wall, ceiling.
-- The model faces the player at placement time (player yaw + 180°).
+- By default placement is allowed on any block face: floor, wall, ceiling. Allowed surfaces are configured per entry with `placement.surfaces`. If the clicked surface is not allowed, nothing is placed and the player sees an action bar message.
+- The model faces the player at placement time (player yaw + 180°). Only the player's yaw is used; the player's pitch has no effect. Tilt is configured with `display.pitch`.
 - Right-clicking an interactable block (chest, door, etc.) without sneaking does not place the item. Sneak to place.
 - Only the main hand is processed.
 - The original `ItemStack` is stored in the PDC of the interaction entity and returned unchanged on pickup. No data files are used.
@@ -70,9 +70,11 @@ Do not leave `[]` after the key when entries are present.
 |---|---|---|
 | `match` | required | Value or list of values to match. |
 | `base_item` | any | Material filter. |
+| `placement.surfaces` | `[floor, wall, ceiling]` | Allowed surfaces: `floor` (top face of a block), `wall` (side faces), `ceiling` (bottom face). A list in an entry replaces the default list entirely. |
 | `display.scale` | `[1, 1, 1]` | Scale. A single number applies uniformly. |
 | `display.offset` | `[0, 0.5, 0]` | Model center offset in the model's local axes. Y points away from the surface. |
 | `display.rotation_offset` | `0` | Additional rotation around the model's vertical axis, in degrees. |
+| `display.pitch` | `0` | Model tilt around its own horizontal axis, in degrees. Independent of the player's pitch. A positive value tilts the front of the model down. The model tilts around its center; `display.offset` is not affected. |
 | `display.align_to_surface` | `true` | `true`: the model's bottom lies on the clicked surface (floor, wall, ceiling). `false`: the model always stays upright. |
 | `display.item_transform` | `NONE` | `ItemDisplayTransform` name. |
 | `display.view_range` | `1.0` | View range multiplier. |

@@ -1,6 +1,7 @@
 package net.dvmn2.placeablemodelplugin.config;
 
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemDisplay;
 import org.joml.Vector3f;
 
@@ -14,6 +15,7 @@ public record PlaceableDefinition(
         DefinitionType type,
         Set<String> values,
         Material baseItem,            // null = любой тип предмета
+        Set<Surface> surfaces,        // на какие поверхности можно ставить
 
         // ItemDisplay
         Vector3f scale,
@@ -37,6 +39,11 @@ public record PlaceableDefinition(
         SoundSpec pickupSound
 ) {
     public record SoundSpec(String key, float volume, float pitch) {
+    }
+
+    /** Можно ли ставить модель на указанную грань блока. */
+    public boolean allows(BlockFace face) {
+        return surfaces.contains(Surface.of(face));
     }
 
     public boolean hasBrightness() {

@@ -75,6 +75,10 @@ public final class BlockInteractListener implements Listener {
         }
 
         BlockFace face = event.getBlockFace();
+        if (!def.allows(face)) {
+            Lang.sendActionBar(player, Lang.Key.SURFACE_NOT_ALLOWED);
+            return;
+        }
         Location point = event.getInteractionPoint();
         if (point == null) {
             // Запасной вариант: центр кликнутой грани.

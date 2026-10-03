@@ -18,6 +18,7 @@ public final class Lang {
     public enum Key {
         NO_PERMISSION_PLACE,
         NO_PERMISSION_PICKUP,
+        SURFACE_NOT_ALLOWED,
         RELOADED,
         USAGE
     }
@@ -28,11 +29,13 @@ public final class Lang {
     static {
         RU.put(Key.NO_PERMISSION_PLACE, "§cУ вас нет прав, чтобы ставить этот предмет.");
         RU.put(Key.NO_PERMISSION_PICKUP, "§cУ вас нет прав, чтобы подбирать этот предмет.");
+        RU.put(Key.SURFACE_NOT_ALLOWED, "§cЭтот предмет нельзя поставить на эту поверхность.");
         RU.put(Key.RELOADED, "§aКонфиг перезагружен. Загружено записей: %d.");
         RU.put(Key.USAGE, "§cИспользование: /placeablemodel reload");
 
         EN.put(Key.NO_PERMISSION_PLACE, "§cYou don't have permission to place this item.");
         EN.put(Key.NO_PERMISSION_PICKUP, "§cYou don't have permission to pick this item up.");
+        EN.put(Key.SURFACE_NOT_ALLOWED, "§cThis item cannot be placed on this surface.");
         EN.put(Key.RELOADED, "§aConfig reloaded. Entries loaded: %d.");
         EN.put(Key.USAGE, "§cUsage: /placeablemodel reload");
 
@@ -62,6 +65,10 @@ public final class Lang {
 
     public static Component component(Key key, CommandSender sender, Object... args) {
         return LegacyComponentSerializer.legacySection().deserialize(get(key, sender, args));
+    }
+
+    public static void sendActionBar(Player recipient, Key key, Object... args) {
+        recipient.sendActionBar(component(key, recipient, args));
     }
 
     public static void send(CommandSender recipient, Key key, Object... args) {
