@@ -16,6 +16,9 @@ public record PlaceableDefinition(
         Set<String> values,
         Material baseItem,            // null = любой тип предмета
         Set<Surface> surfaces,        // на какие поверхности можно ставить
+        boolean stackable,            // можно ли ставить предмет поверх такого же
+        int maxStack,                 // макс. число моделей в стопке (0 = без лимита)
+        StackPickup stackPickup,      // что делать при подборе модели, на которой что-то стоит
 
         // ItemDisplay
         Vector3f scale,

@@ -19,6 +19,9 @@ public final class Lang {
         NO_PERMISSION_PLACE,
         NO_PERMISSION_PICKUP,
         SURFACE_NOT_ALLOWED,
+        STACK_BLOCKED,
+        STACK_LIMIT,
+        PICKUP_BLOCKED_STACK,
         RELOADED,
         USAGE
     }
@@ -30,12 +33,18 @@ public final class Lang {
         RU.put(Key.NO_PERMISSION_PLACE, "§cУ вас нет прав, чтобы ставить этот предмет.");
         RU.put(Key.NO_PERMISSION_PICKUP, "§cУ вас нет прав, чтобы подбирать этот предмет.");
         RU.put(Key.SURFACE_NOT_ALLOWED, "§cЭтот предмет нельзя поставить на эту поверхность.");
+        RU.put(Key.STACK_BLOCKED, "§cСверху нет места для установки.");
+        RU.put(Key.STACK_LIMIT, "§cДостигнута максимальная высота стопки.");
+        RU.put(Key.PICKUP_BLOCKED_STACK, "§cСначала уберите предметы, стоящие сверху.");
         RU.put(Key.RELOADED, "§aКонфиг перезагружен. Загружено записей: %d.");
         RU.put(Key.USAGE, "§cИспользование: /placeablemodel reload");
 
         EN.put(Key.NO_PERMISSION_PLACE, "§cYou don't have permission to place this item.");
         EN.put(Key.NO_PERMISSION_PICKUP, "§cYou don't have permission to pick this item up.");
         EN.put(Key.SURFACE_NOT_ALLOWED, "§cThis item cannot be placed on this surface.");
+        EN.put(Key.STACK_BLOCKED, "§cThere is no room to place this on top.");
+        EN.put(Key.STACK_LIMIT, "§cMaximum stack height reached.");
+        EN.put(Key.PICKUP_BLOCKED_STACK, "§cRemove the items on top first.");
         EN.put(Key.RELOADED, "§aConfig reloaded. Entries loaded: %d.");
         EN.put(Key.USAGE, "§cUsage: /placeablemodel reload");
 

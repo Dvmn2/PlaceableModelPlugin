@@ -35,6 +35,7 @@ public final class DefinitionRegistry {
     private volatile Map<DefinitionType, Map<String, List<PlaceableDefinition>>> index = emptyIndex();
     private volatile SoundSpec defaultPlaceSound;
     private volatile SoundSpec defaultPickupSound;
+    private volatile StackPickup defaultStackPickup = StackPickup.ALL;
     private volatile boolean placeThroughModels = true;
 
     public SoundSpec defaultPlaceSound() {
@@ -43,6 +44,10 @@ public final class DefinitionRegistry {
 
     public SoundSpec defaultPickupSound() {
         return defaultPickupSound;
+    }
+
+    public StackPickup defaultStackPickup() {
+        return defaultStackPickup;
     }
 
     public boolean placeThroughModels() {
@@ -129,6 +134,7 @@ public final class DefinitionRegistry {
         Params emptyEntry = new Params(new MemoryConfiguration(), defaults);
         this.defaultPlaceSound = readSound(emptyEntry, "place");
         this.defaultPickupSound = readSound(emptyEntry, "pickup");
+        this.defaultStackPickup = readStackPickup(emptyEntry.get("placement.stack_pickup"), "defaults", log);
 
         Map<DefinitionType, Map<String, List<PlaceableDefinition>>> fresh = emptyIndex();
         int total = 0;
@@ -198,6 +204,9 @@ public final class DefinitionRegistry {
 
         // --- допустимые поверхности ---
         Set<Surface> surfaces = readSurfaces(p.get("placement.surfaces"), where, log);
+        boolean stackable = p.bool("placement.stackable", false);
+        int maxStack = Math.max(0, (int) p.num("placement.max_stack", 8f));
+        StackPickup stackPickup = readStackPickup(p.get("placement.stack_pickup"), where, log);
 
         // --- ItemDisplay ---
         Vector3f scale = readScale(p.get("display.scale"), new Vector3f(1f, 1f, 1f), where, log);
@@ -235,7 +244,7 @@ public final class DefinitionRegistry {
         boolean responsive = p.bool("interaction.responsive", false);
 
         return new PlaceableDefinition(
-                type, Set.copyOf(values), baseItem, surfaces,
+                type, Set.copyOf(values), baseItem, surfaces, stackable, maxStack, stackPickup,
                 scale, offset, rotationOffset, pitch, align, transform, viewRange, blockLight, skyLight,
                 width, height, yOffset, responsive,
                 readSound(p, "place"), readSound(p, "pickup"));
@@ -254,6 +263,18 @@ public final class DefinitionRegistry {
             s = "minecraft:" + s.trim();
         }
         values.add(type == DefinitionType.RENAME || type == DefinitionType.CUSTOM_MODEL_DATA ? s : s.trim());
+    }
+
+    private static StackPickup readStackPickup(Object raw, String where, Logger log) {
+        if (raw == null) {
+            return StackPickup.ALL;
+        }
+        StackPickup mode = StackPickup.parse(String.valueOf(raw));
+        if (mode == null) {
+            log.warning("[config] " + where + ": unknown stack_pickup '" + raw + "' (expected all, top_only), using all.");
+            return StackPickup.ALL;
+        }
+        return mode;
     }
 
     private static Set<Surface> readSurfaces(Object raw, String where, Logger log) {

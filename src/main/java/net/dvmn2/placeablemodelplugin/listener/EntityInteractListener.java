@@ -26,6 +26,8 @@ import org.bukkit.util.Vector;
  * ПКМ по Interaction-сущности поставленной модели:
  * <ul>
  *     <li>пустая основная рука — подобрать модель (исходный предмет возвращается);</li>
+ *     <li>в руке тот же предмет, у записи {@code placement.stackable: true} и игрок не
+ *     крадётся — предмет ставится поверх (на верх хитбокса самой верхней модели стопки);</li>
  *     <li>в руке предмет-модель и включён {@code settings.place_through_models} —
  *     предмет ставится на блок, который находится за хитбоксом (иначе хитбокс
  *     мешал бы ставить модели вплотную друг к другу).</li>
@@ -76,7 +78,7 @@ public final class EntityInteractListener implements Listener {
         if (held.getType().isAir()) {
             handlePickup(player, interaction);
         } else {
-            handlePlaceThrough(player, held);
+            handleHeldItem(player, interaction, held);
         }
     }
 
@@ -88,16 +90,46 @@ public final class EntityInteractListener implements Listener {
         manager.pickup(player, interaction);
     }
 
-    private void handlePlaceThrough(Player player, ItemStack held) {
-        if (!registry.placeThroughModels()) {
-            return;
-        }
+    private void handleHeldItem(Player player, Interaction interaction, ItemStack held) {
         PlaceableDefinition def = registry.find(held);
         if (def == null) {
             return;
         }
         if (!player.hasPermission(PlaceableModelPlugin.PERM_PLACE)) {
             Lang.send(player, Lang.Key.NO_PERMISSION_PLACE);
+            return;
+        }
+
+        // Тот же предмет, стопка разрешена, игрок не крадётся -> ставим сверху.
+        // С Shift клик работает как обычная "постановка сквозь модель".
+        if (def.stackable()
+                && def.allows(BlockFace.UP)
+                && !player.isSneaking()
+                && manager.isSameModel(interaction, def)) {
+            handleStack(player, interaction, held, def);
+            return;
+        }
+
+        handlePlaceThrough(player, held, def);
+    }
+
+    private void handleStack(Player player, Interaction clicked, ItemStack held, PlaceableDefinition def) {
+        Interaction top = manager.findStackTop(clicked, def);
+        if (top == null) {
+            Lang.sendActionBar(player, Lang.Key.STACK_BLOCKED);
+            return;
+        }
+        if (def.maxStack() > 0 && manager.stackHeight(top, def) >= def.maxStack()) {
+            Lang.sendActionBar(player, Lang.Key.STACK_LIMIT);
+            return;
+        }
+        if (manager.placeOnTop(player, top, held, def)) {
+            manager.consumeOne(player);
+        }
+    }
+
+    private void handlePlaceThrough(Player player, ItemStack held, PlaceableDefinition def) {
+        if (!registry.placeThroughModels()) {
             return;
         }
 

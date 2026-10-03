@@ -13,7 +13,8 @@ Paper plugin that lets players place items with a custom model as `item_display`
 |---|---|
 | Right-click a block face with a matching item in the main hand | The item is placed at the exact click point. One item is consumed (not in Creative). |
 | Right-click a placed model with an empty main hand | The model is removed and the original item is returned. |
-| Right-click a placed model with a matching item in the main hand | The item is placed on the block behind the model (`settings.place_through_models`). |
+| Right-click a placed model with the same item in the main hand (`placement.stackable: true`) | The item is placed on top of the stack. |
+| Right-click a placed model with a matching item in the main hand (otherwise, or while sneaking) | The item is placed on the block behind the model (`settings.place_through_models`). |
 
 Details:
 
@@ -71,6 +72,9 @@ Do not leave `[]` after the key when entries are present.
 | `match` | required | Value or list of values to match. |
 | `base_item` | any | Material filter. |
 | `placement.surfaces` | `[floor, wall, ceiling]` | Allowed surfaces: `floor` (top face of a block), `wall` (side faces), `ceiling` (bottom face). A list in an entry replaces the default list entirely. |
+| `placement.stackable` | `false` | Allows stacking: right-clicking the hitbox of a placed model of the same item with that item places a new model on top. The bottom of the new hitbox is aligned with the top of the existing hitbox. Requires `floor` in `placement.surfaces`. |
+| `placement.max_stack` | `8` | Maximum number of models of the same item in one stack. `0` = unlimited (a hard scan limit of 64 models still applies). |
+| `placement.stack_pickup` | `all` | Behavior when a model with other models on top is picked up. `all`: the model and everything above it are picked up and all items are returned. `top_only`: only the topmost model can be picked up; the lower ones are protected. |
 | `display.scale` | `[1, 1, 1]` | Scale. A single number applies uniformly. |
 | `display.offset` | `[0, 0.5, 0]` | Model center offset in the model's local axes. Y points away from the surface. |
 | `display.rotation_offset` | `0` | Additional rotation around the model's vertical axis, in degrees. |
@@ -106,6 +110,20 @@ The interaction hitbox is centered on the model's center and is always axis-alig
 | `placeablemodel.place` | Place models. | everyone |
 | `placeablemodel.pickup` | Pick models up. | everyone |
 | `placeablemodel.reload` | Reload the config. | op |
+
+## Stacking
+
+With `placement.stackable: true`, right-clicking a placed model of the same item with that item places a new model on top of it.
+
+- "Same item" means both items match the same config entry.
+- The vertical position is derived from the interaction hitboxes only: the new hitbox starts where the lower one ends. Set `interaction.height` (and `interaction.y_offset`) so that it equals the visual height of the model.
+- If the stack already has models on top, the new model is placed on the topmost model of that stack.
+- If a model of a different item sits on top of the stack, nothing is placed and the player sees an action bar message.
+- A stacked model is horizontally centered on the lower one and oriented as on the floor (player yaw).
+- Sneaking bypasses stacking and places the item on the block behind the model.
+- Stack height is limited by `placement.max_stack`. When the limit is reached, nothing is placed and the player sees an action bar message. Models of a different item under the stack (for example a table) are not counted.
+- Picking up a model that has models on top is controlled by `placement.stack_pickup`: `all` returns the model and everything above it; `top_only` allows picking up only the topmost model.
+- With `all`, every model resting on the picked-up one is returned, regardless of its item.
 
 ## Limitations
 
